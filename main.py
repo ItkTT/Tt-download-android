@@ -44,3 +44,4 @@ app.mainloop()
  
 # Фінальна спроба
 # 
+# update 1
