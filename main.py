@@ -45,3 +45,4 @@ app.mainloop()
 # Фінальна спроба
 # 
 # update 1
+# last update: 15:20
