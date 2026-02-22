@@ -1,63 +1,43 @@
-import flet as ft
+import customtkinter as ctk
 import yt_dlp
+import threading
 
-def main(page: ft.Page):
-    page.title = "TT Downloader"
-    page.theme_mode = ft.ThemeMode.DARK # Темна тема, як у справжнього хакера
-    page.vertical_alignment = ft.MainAxisAlignment.CENTER
-
-    # Поле для введення посилання
-    url_input = ft.TextField(label="Встав посилання на TikTok", width=300)
+def download():
+    url = entry.get()
+    if not url:
+        label.configure(text="❌ Встав посилання!", text_color="red")
+        return
     
-    # Текст статусу
-    status_text = ft.Text()
-
-    def download_click(e):
-        link = url_input.value
-        if not link:
-            status_text.value = "❌ Будь ласка, встав посилання!"
-            page.update()
-            return
-        
-        status_text.value = "⏳ Завантаження почалося..."
-        status_text.color = ft.colors.BLUE_200
-        page.update()
-
+    label.configure(text="⏳ Завантаження...", text_color="yellow")
+    
+    # Запускаємо в окремому потоці, щоб програма не зависала
+    def run():
         try:
             ydl_opts = {
                 'format': 'bestaudio/best',
                 'outtmpl': '/data/data/com.termux/files/home/storage/downloads/%(title)s.%(ext)s',
-                'postprocessors': [{
-                    'key': 'FFmpegExtractAudio',
-                    'preferredcodec': 'mp3',
-                    'preferredquality': '192',
-                }],
+                'postprocessors': [{'key': 'FFmpegExtractAudio','preferredcodec': 'mp3','preferredquality': '192'}]
             }
             with yt_dlp.YoutubeDL(ydl_opts) as ydl:
-                ydl.download([link])
-            
-            status_text.value = "✅ Звук збережено в Downloads!"
-            status_text.color = ft.colors.GREEN_400
-        except Exception as ex:
-            status_text.value = f"❌ Помилка: {ex}"
-            status_text.color = ft.colors.RED_400
-        
-        page.update()
+                ydl.download([url])
+            label.configure(text="✅ Готово в Downloads!", text_color="green")
+        except Exception as e:
+            label.configure(text=f"❌ Помилка", text_color="red")
 
-    # Кнопка
-    download_btn = ft.ElevatedButton("Скачати MP3", on_click=download_click)
+    threading.Thread(target=run).start()
 
-    # Додаємо елементи на екран
-    page.add(
-        ft.Column(
-            [
-                ft.Text("TT Audio Downloader", size=30, weight="bold"),
-                url_input,
-                download_btn,
-                status_text,
-            ],
-            horizontal_alignment=ft.CrossAxisAlignment.CENTER,
-        )
-    )
+# Налаштування вікна
+app = ctk.CTk()
+app.geometry("400x240")
+app.title("TT Downloader")
 
-ft.app(target=main)
+label = ctk.CTkLabel(app, text="TikTok MP3 Downloader", font=("Arial", 20))
+label.pack(pady=20)
+
+entry = ctk.CTkEntry(app, placeholder_text="Посилання на відео", width=300)
+entry.pack(pady=10)
+
+btn = ctk.CTkButton(app, text="Скачати Звук", command=download)
+btn.pack(pady=20)
+
+app.mainloop()
