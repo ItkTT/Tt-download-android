@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TT & PUBG Pro Downloader</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; text-align: center; padding: 20px; background: #0b0e11; color: #ffffff; }
+        .card { max-width: 450px; margin: 40px auto; background: #15191c; padding: 30px; border-radius: 20px; border: 1px solid #fe2c55; box-shadow: 0 0 20px rgba(254, 44, 85, 0.2); }
+        h1 { color: #fe2c55; margin-bottom: 5px; }
+        input { width: 90%; padding: 15px; margin: 20px 0; border-radius: 10px; border: 1px solid #333; background: #1e2327; color: white; font-size: 16px; }
+        button { width: 95%; padding: 15px; background: #fe2c55; color: white; border: none; border-radius: 10px; font-weight: bold; cursor: pointer; font-size: 18px; }
+        #result { margin-top: 25px; display: none; }
+        .download-link { display: inline-block; padding: 10px 20px; background: #25d366; color: white; text-decoration: none; border-radius: 8px; margin-top: 10px; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <h1>TT & PUBG Saver</h1>
+        <p style="color: #888;">Вставте посилання для миттєвого завантаження</p>
+        <input type="text" id="videoUrl" placeholder="Вставте посилання тут...">
+        <button onclick="processVideo()">ОБРОБИТИ</button>
+
+        <div id="result">
+            <p>Відео готове!</p>
+            <a id="dlBtn" class="download-link" href="#" download>СКАЧАТИ ФАЙЛ</a>
+        </div>
+    </div>
+
+    <script>
+        async function processVideo() {
+            const url = document.getElementById('videoUrl').value;
+            const resDiv = document.getElementById('result');
+            const dlBtn = document.getElementById('dlBtn');
+            
+            if(!url) return alert('Вставте посилання!');
+            
+            alert('Починаю обробку... Зачекайте 5-10 секунд.');
+            
+            // Використовуємо відкритий API для TikTok (приклад структури)
+            try {
+                // Це приклад запиту до безкоштовного API
+                const apiLink = `https://api.tiklydown.eu.org/api/download?url=${encodeURIComponent(url)}`;
+                const response = await fetch(apiLink);
+                const data = await response.json();
+                
+                if(data.video && data.video.noWatermark) {
+                    dlBtn.href = data.video.noWatermark;
+                    resDiv.style.display = 'block';
+                } else {
+                    alert('Не вдалося знайти відео. Перевірте посилання.');
+                }
+            } catch (e) {
+                alert('Помилка сервера. Спробуйте інше посилання.');
+            }
+        }
+    </script>
+</body>
+</html>
